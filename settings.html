@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpendWise — Settings</title>
+  
+
+    
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+
+  :root {
+    --bg: #080c17;
+    --surface: #0f1623;
+    --surface2: #161e2e;
+    --surface3: #1d2640;
+    --accent: #00d4aa;
+    --accent2: #7c6af7;
+    --accent3: #ff6b6b;
+    --text: #eef2ff;
+    --muted: #5c6b8a;
+    --muted2: #8899bb;
+    --border: rgba(255,255,255,0.06);
+    --border2: rgba(255,255,255,0.1);
+    --radius: 16px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: block;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,212,170,0.07) 0%, transparent 70%);
+    top: -200px; left: 50%; transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .login-container {
+    background: var(--surface);
+    padding: 48px 52px;
+    border-radius: 24px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5), 0 0 0 1px var(--border);
+    text-align: center;
+    width: 90%;
+    max-width: 860px;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  .login-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(0,212,170,0.06), transparent 60%);
+    border-radius: 24px;
+    pointer-events: none;
+  }
+
+  .title, .login-container h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text);
+    letter-spacing: -1px;
+  }
+
+  .subtitle {
+    margin-bottom: 40px;
+    color: var(--muted2);
+    font-size: 15px;
+  }
+
+  .mode-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .mode-card {
+    background: var(--surface2);
+    padding: 36px 28px;
+    border-radius: 18px;
+    width: 280px;
+    text-decoration: none;
+    color: var(--text);
+    border: 2px solid var(--border);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mode-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at top left, rgba(0,212,170,0.06), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .mode-card:hover { transform: translateY(-6px); }
+  .mode-card:hover::before { opacity: 1; }
+
+  .mode-card h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  .mode-card p {
+    color: var(--muted2);
+    font-size: 13.5px;
+    line-height: 1.6;
+    text-align: left;
+  }
+
+  .professional {
+    border-color: rgba(0,212,170,0.2);
+  }
+
+  .professional:hover {
+    border-color: var(--accent);
+    background: rgba(0,212,170,0.05);
+    color: var(--text);
+    box-shadow: 0 16px 48px rgba(0,212,170,0.15);
+  }
+
+  .student {
+    border-color: rgba(124,106,247,0.2);
+  }
+
+  .student:hover {
+    border-color: var(--accent2);
+    background: rgba(124,106,247,0.05);
+    color: var(--text);
+    box-shadow: 0 16px 48px rgba(124,106,247,0.15);
+  }
+
+  /* ─── REGISTRATION FORM ─── */
+  input:not([type="range"]):not([type="color"]):not([type="checkbox"]):not([type="radio"]) {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 13px 16px;
+    font-size: 14px;
+    width: 100%;
+    margin: 6px 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+
+  input:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(0,212,170,0.12);
+  }
+
+  input::placeholder { color: var(--muted); }
+
+  .btn, button[type="submit"] {
+    background: var(--accent);
+    color: #0a0e1a;
+    border: none;
+    padding: 13px 28px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 15px;
+    width: 100%;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 8px;
+  }
+
+  .btn:hover, button[type="submit"]:hover {
+    background: #00f0c0;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,212,170,0.3);
+  }
+
+  .btn-enter {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #0a0e1a;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-enter:hover {
+    background: #00f0c0;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,212,170,0.3);
+  }
+
+  .btn-new-user {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--muted2);
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-new-user:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--muted); font-size: 12px;
+    width: 100%; margin: 8px 0;
+  }
+
+  .divider::before, .divider::after {
+    content: ''; flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .back-link {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 4px;
+    text-decoration: underline;
+  }
+
+  .welcome-back {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 10px 0 6px;
+  }
+
+  .welcome-back .avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+    box-shadow: 0 0 0 6px rgba(0,212,170,0.12);
+  }
+
+  .wb-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800; color: var(--text);
+  }
+
+  .wb-email, .wb-sub {
+    font-size: 13px; color: var(--muted); margin-top: -8px;
+  }
+
+  .dark-toggle-login {
+    margin-top: 24px;
+    display: flex; align-items: center;
+    justify-content: center; gap: 10px;
+    font-size: 13px; color: var(--muted);
+  }
+
+  .error {
+    color: var(--accent3);
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 60px auto;
+    padding: 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .container h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 32px;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  .setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+
+  .setting.center { justify-content: center; border-bottom: none; margin-top: 8px; }
+  .setting label { color: var(--text); font-weight: 500; font-size: 14px; }
+
+  .toggle-switch {
+    position: relative; width: 44px; height: 24px; flex-shrink: 0;
+  }
+  .toggle-switch input { display: none; }
+  .toggle-switch .slider {
+    position: absolute;
+    cursor: pointer;
+    background: var(--surface3);
+    border-radius: 34px; inset: 0;
+    transition: 0.3s;
+    border: 1px solid var(--border2);
+  }
+  .toggle-switch .slider::before {
+    content: "";
+    position: absolute; height: 16px; width: 16px;
+    left: 3px; bottom: 3px;
+    background: var(--muted2); border-radius: 50%;
+    transition: 0.3s;
+  }
+  .toggle-switch input:checked + .slider { background: var(--accent); border-color: var(--accent); }
+  .toggle-switch input:checked + .slider::before { transform: translateX(20px); background: #0a0e1a; }
+
+  .setting select {
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border2); border-radius: 8px;
+    padding: 8px 14px; font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none; cursor: pointer;
+  }
+  .setting select:focus { border-color: var(--accent); }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    height: 5px; background: var(--surface3);
+    border-radius: 5px; outline: none; cursor: pointer; width: 140px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    box-shadow: 0 0 8px rgba(0,212,170,0.4);
+  }
+
+  .range-value {
+    font-family: 'Syne', sans-serif; font-size: 14px;
+    font-weight: 700; color: var(--accent);
+    min-width: 50px; text-align: right;
+  }
+
+  .reset-btn {
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border2); padding: 10px 20px;
+    border-radius: 10px; cursor: pointer; font-weight: 600;
+    font-size: 13px; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .reset-btn:hover { background: var(--surface3); transform: translateY(-1px); }
+
+  #saveMsg { text-align: center; color: var(--accent); font-size: 14px; display: none; margin-top: 16px; }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>⚙️ Settings</h1>
+
+    
+    <div class="setting">
+      <label>Dark Mode</label>
+      <label class="toggle-switch">
+        <input type="checkbox" id="darkMode" class="dark-mode-toggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    
+    <div class="setting">
+      <label>Display Currency</label>
+      <select id="currencyPref">
+        <option value="INR">₹ Indian Rupee (INR)</option>
+        <option value="USD">$ US Dollar (USD)</option>
+        <option value="EUR">€ Euro (EUR)</option>
+        <option value="GBP">£ British Pound (GBP)</option>
+      </select>
+    </div>
+
+    
+    <div class="setting">
+      <label>Budget Alert at (%)</label>
+      <input type="range" min="10" max="100" value="80" id="alertThreshold" step="5">
+      <span class="range-value" id="thresholdVal">80%</span>
+    </div>
+
+    
+    <div class="setting">
+      <label>Font Size</label>
+      <input type="range" min="12" max="22" value="16" id="fontSize" step="1">
+      <span class="range-value" id="fontVal">16px</span>
+    </div>
+
+    
+    <div class="setting">
+      <label>Reset Monthly Expenses</label>
+      <button class="reset-btn" id="resetExpBtn">🗑️ Clear All Expenses</button>
+    </div>
+
+    
+    <div class="setting">
+      <label>Log Out &amp; Clear Account</label>
+      <button class="reset-btn" id="clearAccBtn" style="background:#ef4444">🚪 Log Out</button>
+    </div>
+
+    
+    <div class="setting center">
+      <button class="reset-btn" id="saveBtn" style="background:#00d4aa;color:#0a0e1a">💾 Save Settings</button>
+    </div>
+
+    <p id="saveMsg" style="text-align:center;color:#22c55e;font-size:14px;display:none;">✅ Settings saved!</p>
+  </div>
+
+  <script>
+    
+    const threshold = localStorage.getItem("alertThreshold") || 80;
+    const fontSize = localStorage.getItem("fontSize") || 16;
+    const currency = localStorage.getItem("currencyPref") || "INR";
+
+    document.getElementById("alertThreshold").value = threshold;
+    document.getElementById("thresholdVal").textContent = threshold + "%";
+    document.getElementById("fontSize").value = fontSize;
+    document.getElementById("fontVal").textContent = fontSize + "px";
+    document.getElementById("currencyPref").value = currency;
+    document.body.style.fontSize = fontSize + "px";
+
+    
+    document.getElementById("alertThreshold").addEventListener("input", function () {
+      document.getElementById("thresholdVal").textContent = this.value + "%";
+    });
+    document.getElementById("fontSize").addEventListener("input", function () {
+      document.getElementById("fontVal").textContent = this.value + "px";
+      document.body.style.fontSize = this.value + "px";
+    });
+
+    
+    document.getElementById("saveBtn").addEventListener("click", function () {
+      localStorage.setItem("alertThreshold", document.getElementById("alertThreshold").value);
+      localStorage.setItem("fontSize", document.getElementById("fontSize").value);
+      localStorage.setItem("currencyPref", document.getElementById("currencyPref").value);
+      const msg = document.getElementById("saveMsg");
+      msg.style.display = "block";
+      setTimeout(() => msg.style.display = "none", 2500);
+    });
+
+    
+    document.getElementById("resetExpBtn").addEventListener("click", function () {
+      if (confirm("Clear all your logged expenses? This cannot be undone.")) {
+        localStorage.setItem("expenses", JSON.stringify([]));
+        localStorage.setItem("proExpenses", JSON.stringify([]));
+        localStorage.setItem("spent", 0);
+        alert("✅ All expenses cleared!");
+      }
+    });
+
+    
+    document.getElementById("clearAccBtn").addEventListener("click", function () {
+      if (confirm("Log out and clear your account? You'll need to register again.")) {
+        localStorage.removeItem("loggedIn");
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+
+</html>

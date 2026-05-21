@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>SpendWise | Smart Expense Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --surface: #111827;
+      --surface2: #1a2235;
+      --accent: #00d4aa;
+      --accent2: #7c6af7;
+      --accent3: #ff6b6b;
+      --text: #f0f4ff;
+      --muted: #6b7a99;
+      --border: rgba(255,255,255,0.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+      /* FLOATING CARDS */
+  .hero-cards {
+    position: relative; width: 100%; max-width: 900px;
+    margin: 80px auto 0;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+  .dashboard-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+  }
+  .preview-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 28px;
+  }
+  .preview-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+  .preview-date { font-size: 13px; color: var(--muted); }
+  .preview-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--surface2); border-radius: 12px; padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-val { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
+  .stat-val.green { color: var(--accent); }
+  .stat-val.purple { color: var(--accent2); }
+  .stat-val.red { color: var(--accent3); }
+  .stat-change { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .stat-change.up { color: var(--accent); }
+
+  /* PROGRESS BAR */
+  .progress-section { margin-bottom: 24px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+  .progress-bar { height: 6px; background: var(--surface2); border-radius: 100px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 100px; transition: width 1s ease; }
+  .progress-fill.green { background: linear-gradient(90deg, var(--accent), #00f0c0); }
+  .progress-fill.purple { background: linear-gradient(90deg, var(--accent2), #a594ff); }
+  .progress-fill.red { background: linear-gradient(90deg, var(--accent3), #ff9a9a); }
+
+  /* FLOATING BADGE */
+  .float-badge {
+    position: absolute;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 16px;
+    font-size: 13px; font-weight: 500;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    display: flex; align-items: center; gap: 8px;
+    animation: float 3s ease-in-out infinite;
+  }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .float-badge.tl { top: -20px; left: -40px; animation-delay: 0s; }
+  .float-badge.tr { top: -20px; right: -40px; animation-delay: 1s; }
+  .float-badge.bl { bottom: 40px; left: -60px; animation-delay: 0.5s; }
+    /* NAV */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 60px;
+      background: rgba(10, 14, 26, 0.88);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 14px;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0; bottom: -5px;
+      width: 0; height: 2px;
+      background: var(--accent);
+      border-radius: 20px;
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #0a0e1a;
+      padding: 10px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .nav-cta:hover { background: #00f0c0; transform: translateY(-1px); }
+
+    /* HERO */
+    .main {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1a2235, #0a0e1a);
+      color: var(--text);
+      padding: 130px 20px 110px;
+      text-align: center;
+    }
+
+    .main::before, .main::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      z-index: 0;
+    }
+
+    .main::before {
+      width: 480px; height: 480px;
+      background: rgba(0, 212, 170, 0.12);
+      top: -80px; left: 8%;
+    }
+
+    .main::after {
+      width: 360px; height: 360px;
+      background: rgba(124, 106, 247, 0.10);
+      bottom: -100px; right: 10%;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.3);
+      color: var(--accent);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 28px;
+      position: relative;
+      z-index: 1;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.5)} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+    .main h1, .main p, .main .btn { position: relative; z-index: 1; }
+
+    .main h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(40px, 6vw, 76px);
+      line-height: 1.08;
+      font-weight: 800;
+      margin-bottom: 22px;
+      letter-spacing: -2px;
+      animation: fadeUp 0.6s 0.1s ease both;
+    }
+
+    .main h1 span { color: var(--accent); }
+    .main h1 em { font-style: normal; color: var(--accent2); }
+
+    .main p {
+      font-size: 18px;
+      max-width: 600px;
+      margin: 0 auto 36px;
+      color: var(--muted);
+      font-weight: 300;
+      animation: fadeUp 0.6s 0.2s ease both;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.6s 0.3s ease both;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 34px;
+      background: var(--accent);
+      color: #0a0e1a;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.2s;
+      box-shadow: 0 8px 24px rgba(0, 212, 170, 0.30);
+    }
+
+    .btn:hover {
+      background: #00f0c0;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(0, 212, 170, 0.38);
+    }
+
+    .btn-ghost {
+      display: inline-block;
+      padding: 14px 34px;
+      background: var(--surface);
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 16px;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    /* HERO DASHBOARD PREVIEW */
+    .hero-dashboard-preview {
+      position: relative;
+      z-index: 1;
+      margin: 60px auto 0;
+      max-width: 820px;
+      animation: fadeUp 0.6s 0.5s ease both;
+    }
+
+    .preview-label {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .preview-label::before, .preview-label::after {
+      content: "";
+      flex: 1;
+      max-width: 80px;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .dashboard-card {
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid rgba(0,212,170,0.15);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,212,170,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      text-align: left;
+    }
+
+    .dash-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .dash-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .dash-title span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+      margin-left: 8px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .dash-badges {
+      display: flex;
+      gap: 8px;
+    }
+
+    .dash-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 100px;
+      background: rgba(0,212,170,0.12);
+      color: var(--accent);
+      border: 1px solid rgba(0,212,170,0.25);
+    }
+
+    .dash-badge.goal {
+      background: rgba(124,106,247,0.12);
+      color: var(--accent2);
+      border-color: rgba(124,106,247,0.25);
+    }
+
+    .dash-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .dash-stat {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .dash-stat-label {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .dash-stat-val {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .dash-stat-val.spent { color: #ff6b6b; }
+    .dash-stat-val.saved { color: var(--accent2); }
+
+    .dash-stat-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .dash-stat-sub.up { color: var(--accent); }
+    .dash-stat-sub.warn { color: #f59e0b; }
+
+    .dash-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .dash-bar-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .dash-bar-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .dash-bar-track {
+      height: 7px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+
+    .dash-bar-fill {
+      height: 100%;
+      border-radius: 100px;
+      width: 0%;
+      transition: width 1.8s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .dash-bar-fill.food { background: linear-gradient(90deg, #00d4aa, #00f0c0); }
+    .dash-bar-fill.transport { background: linear-gradient(90deg, #7c6af7, #a89bf9); }
+    .dash-bar-fill.entertain { background: linear-gradient(90deg, #ff6b6b, #ff8e8e); width: 0%; }
+
+    .dash-alert {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+      color: #f59e0b;
+      animation: alertPulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes alertPulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .dash-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .dash-score {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .score-ring {
+      width: 42px;
+      height: 42px;
+    }
+
+    .dash-score-text {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .dash-score-text strong {
+      display: block;
+      font-size: 16px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .spendbot-preview {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,212,170,0.08);
+      border: 1px solid rgba(0,212,170,0.2);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: var(--accent);
+      animation: botTyping 3s ease-in-out infinite;
+    }
+
+    @keyframes botTyping {
+      0%,100% { opacity: 1; }
+      40% { opacity: 0.6; }
+      70% { opacity: 1; }
+    }
+
+    .typing-dots span {
+      display: inline-block;
+      width: 4px; height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin: 0 1px;
+      animation: dot 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dot { 0%,80%,100%{transform:scale(1);opacity:0.4} 40%{transform:scale(1.4);opacity:1} }
+
+    @media (max-width: 640px) {
+      .hero-dashboard-preview { max-width: 100%; padding: 0 16px; }
+      .dash-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .dash-stat-val { font-size: 17px; }
+    }
+    .stats-bar {
+      padding: 50px 60px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .stats-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      text-align: center;
+    }
+
+    .stat-item .num {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .stat-item .label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+
+    /* ABOUT */
+    .about {
+      padding: 90px 20px;
+      text-align: center;
+      background: var(--bg);
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .about h2, .features h2, .how h2, .mode-section h2, .references h2, .cta h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--text);
+      letter-spacing: -1px;
+    }
+
+    .about p {
+      max-width: 760px;
+      margin: auto;
+      font-size: 17px;
+      color: var(--muted);
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 90px 20px;
+      background: var(--surface);
+      text-align: center;
+    }
+
+    .features-header p {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 500px;
+      margin: 10px auto 48px;
+    }
+
+    .feature-grid {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .feature-card {
+      background: var(--surface2);
+      padding: 36px 28px;
+      width: 300px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at top left, rgba(0,212,170,0.06), transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover { transform: translateY(-7px); box-shadow: 0 20px 45px rgba(0, 212, 170, 0.13); border-color: rgba(0,212,170,0.25); }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 50px; height: 50px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    .feature-icon.green { background: rgba(0,212,170,0.12); }
+    .feature-icon.purple { background: rgba(124,106,247,0.12); }
+    .feature-icon.red { background: rgba(255,107,107,0.12); }
+
+    .feature-card h3 {
+      margin-bottom: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .feature-card p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+    /* MODES */
+    .mode-section {
+      padding: 90px 20px;
+      background: var(--bg);
+      text-align: center;
+    }
+
+    .mode-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .mode-card {
+      text-decoration: none;
+      width: 310px;
+      padding: 44px 32px;
+      border-radius: 22px;
+      color: white;
+      transition: all 0.3s;
+      text-align: left;
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mode-card::before {
+      content: "";
+      position: absolute;
+      width: 160px; height: 160px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      top: -40px; right: -40px;
+    }
+
+    .mode-card h3, .mode-card p { position: relative; z-index: 1; }
+    .mode-card .icon { font-size: 40px; margin-bottom: 18px; display: block; position: relative; z-index: 1; }
+
+    .mode-card h3 {
+      margin: 0 0 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .mode-card p { font-size: 14px; color: rgba(255, 255, 255, 0.82); margin-bottom: 20px; position: relative; z-index: 1; }
+
+    .mode-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .mode-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .mode-features li::before {
+      content: '✓';
+      font-weight: 700;
+      font-size: 11px;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .professional-card { background: linear-gradient(135deg, #00d4aa, #009e80); }
+    .professional-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 45px rgba(0, 212, 170, 0.3); }
+
+    .student-card { background: linear-gradient(135deg, #7c6af7, #5b4bd4); }
+    .student-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 20px 45px rgba(124, 106, 247, 0.3); }
+
+    /* HOW IT WORKS */
+    .how {
+      padding: 90px 20px;
+      text-align: center;
+      background: var(--surface);
+    }
+
+    .steps {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: nowrap;
+      margin-top: 60px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 35px; left: 12%; right: 12%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 0 16px;
+      position: relative;
+    }
+
+    .step-num {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 20px; font-weight: 800;
+      color: var(--accent);
+      margin: 0 auto 24px;
+      position: relative; z-index: 1;
+    }
+
+    .step h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--text);
+    }
+
+    .step p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+    /* TESTIMONIALS */
+    .references {
+      padding: 90px 20px;
+      background: var(--bg);
+      text-align: center;
+    }
+
+    .reference-grid {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .reference-card {
+      background: var(--surface);
+      padding: 32px 28px;
+      width: 300px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.3s;
+      text-align: left;
+    }
+
+    .reference-card:hover { transform: translateY(-6px); }
+
+    .stars { color: #f59e0b; font-size: 14px; margin-bottom: 14px; }
+
+    .reference-card p {
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .reference-card h4 { color: var(--muted); font-size: 13px; font-weight: 500; }
+
+    /* CTA */
+    .cta {
+      padding: 90px 20px;
+      text-align: center;
+      background: var(--surface);
+    }
+
+    .cta-inner {
+      max-width: 680px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(124,106,247,0.08));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 72px 52px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-glow {
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(0,212,170,0.08), transparent 70%);
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+
+    .cta h2 { margin-bottom: 16px; position: relative; z-index: 1; }
+    .cta p { max-width: 500px; margin: 0 auto 32px; color: var(--muted); font-size: 16px; position: relative; z-index: 1; }
+
+    footer {
+      background: var(--surface2);
+      color: var(--muted);
+      text-align: center;
+      padding: 28px 20px;
+      font-size: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 992px) {
+      .navbar { padding: 18px 30px; }
+    }
+
+    @media (max-width: 768px) {
+      .navbar { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .main { padding: 100px 20px 80px; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .stats-bar { padding: 40px 20px; }
+      .steps { flex-direction: column; align-items: center; }
+      .steps::before { display: none; }
+      .step { width: 100%; max-width: 320px; padding: 0; }
+      .feature-card, .reference-card { width: 100%; max-width: 340px; }
+      .mode-card { width: 100%; max-width: 340px; }
+      .cta-inner { padding: 48px 28px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar">
+    <div class="logo">
+      <div class="logo-icon">💰</div>
+      SpendWise
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">Home</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#modes">Modes</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <a href="login.html" class="nav-cta">Get Started →</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="main">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Smart Money Tracking for Students &amp; Professionals
+    </div>
+    <h1>Track Expenses<br><span>Like a Pro,</span><br><em>Save More.</em></h1>
+    <p>SpendWise helps students and professionals manage income, track spending, and achieve savings goals — all in one clean dashboard.</p>
+    <div class="hero-btns">
+      <a href="login.html" class="btn">Get Started Free →</a>
+      <a href="#features" class="btn-ghost">See Features ↓</a>
+    </div>
+    <div class="hero-cards">
+    <div class="float-badge tl">📊 Health Score: <strong style="color:var(--accent)">87/100</strong></div>
+    <div class="float-badge tr">🎯 Goal: <strong style="color:var(--accent2)">68% reached</strong></div>
+    <div class="float-badge bl">⚠️ Overspent: <strong style="color:var(--accent3)">Food +12%</strong></div>
+        <div class="dashboard-preview">
+      <div class="preview-header">
+        <div class="preview-title">April Overview</div>
+        <div class="preview-date">April 2026 · Student Mode</div>
+      </div>
+      <div class="preview-stats">
+        <div class="stat-card">
+          <div class="stat-label">💵 Income</div>
+          <div class="stat-val green">₹15,000</div>
+          <div class="stat-change up">↑ Pocket Money</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">🛍 Spent</div>
+          <div class="stat-val red">₹8,420</div>
+          <div class="stat-change">56% of budget</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">💎 Saved</div>
+          <div class="stat-val purple">₹6,580</div>
+          <div class="stat-change up">↑ On Track!</div>
+        </div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-label"><span>Food & Dining</span><span>₹3,200 / ₹4,000</span></div>
+        <div class="progress-bar"><div class="progress-fill green" style="width:80%"></div></div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-label"><span>Transport</span><span>₹1,100 / ₹2,000</span></div>
+        <div class="progress-bar"><div class="progress-fill purple" style="width:55%"></div></div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-label"><span>Entertainment</span><span>₹2,800 / ₹2,500</span></div>
+        <div class="progress-bar"><div class="progress-fill red" style="width:112%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-ind">
+    SCROLL
+    <div class="scroll-arrow"></div>
+  </div>
+</section>
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item"><div class="num">10K+</div><div class="label">Active Users</div></div>
+      <div class="stat-item"><div class="num">₹2Cr+</div><div class="label">Expenses Tracked</div></div>
+      <div class="stat-item"><div class="num">98%</div><div class="label">Accuracy Rate</div></div>
+      <div class="stat-item"><div class="num">4.9★</div><div class="label">User Rating</div></div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about">
+    <div class="section-label">About SpendWise</div>
+    <h2>Built for real people,<br>not spreadsheet nerds</h2>
+    <p>SpendWise is a modern personal expense tracking platform designed to make financial awareness simple and practical. Whether you're a student managing pocket money or a professional handling salary and bills, SpendWise adapts to your lifestyle.</p>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-label">Everything You Need</div>
+    <div class="features-header">
+      <h2>Powerful Features</h2>
+      <p>Powerful financial tools wrapped in an interface so simple, you'll actually use it.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon green">💬</div>
+        <h3>Chat Expense Entry</h3>
+        <p>Log expenses in an interactive chat-style interface. Just type what you spent and SpendWise handles the rest — categorization, logging, balance updates.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon purple">📊</div>
+        <h3>Smart Analytics</h3>
+        <p>Understand category-wise spending with visual insights. Weekly trends, overspending alerts, and detailed breakdowns to keep you on track.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon red">🎯</div>
+        <h3>Goal Tracking</h3>
+        <p>Set savings targets for what matters — a new laptop, a trip, an emergency fund. Watch your progress grow day by day.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODES -->
+  <section class="mode-section" id="modes">
+    <div class="section-label">Two Modes</div>
+    <h2>Built for where<br>you are in life</h2>
+    <div class="mode-wrapper">
+      <a href="prof.html" class="mode-card professional-card">
+        <span class="icon">💼</span>
+        <h3>Professional Mode</h3>
+        <p>For working professionals managing salary, investments, and lifestyle expenses.</p>
+        <ul class="mode-features">
+          <li>Salary &amp; bonus tracking</li>
+          <li>EMI &amp; rent management</li>
+          <li>Investment goal tracking</li>
+          <li>Advanced analytics</li>
+        </ul>
+      </a>
+      <a href="student.html" class="mode-card student-card">
+        <span class="icon">🎓</span>
+        <h3>Student Mode</h3>
+        <p>For students managing pocket money or part-time income easily.</p>
+        <ul class="mode-features">
+          <li>Pocket money tracking</li>
+          <li>College expense categories</li>
+          <li>Monthly budget alerts</li>
+          <li>Savings jar goals</li>
+        </ul>
+      </a>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="section-label">Simple Process</div>
+    <h2>Up and running<br>in 3 minutes</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h4>Setup Income</h4>
+        <p>Enter your monthly income or pocket money to personalize your experience.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h4>Add Expenses</h4>
+        <p>Track daily expenses using the chat entry — no forms, just natural text.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h4>View Dashboard</h4>
+        <p>See insights, savings rate, and your financial health score come to life.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <h4>Hit Your Goals</h4>
+        <p>Get alerts when overspending and celebrate milestones as you save more.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="references">
+    <div class="section-label">What Users Say</div>
+    <h2>Loved by students<br>&amp; professionals</h2>
+    <div class="reference-grid">
+      <div class="reference-card">
+        <div class="stars">★★★★★</div>
+        <p>"SpendWise helped me save consistently every month. I finally know where my money goes!"</p>
+        <h4>— College Student</h4>
+      </div>
+      <div class="reference-card">
+        <div class="stars">★★★★★</div>
+        <p>"The dashboard gives a crystal-clear view of my salary and expenses. Best finance app I've used."</p>
+        <h4>— Working Professional</h4>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <div class="cta-inner">
+      <div class="cta-glow"></div>
+      <div class="section-label">Get Started Today</div>
+      <h2>Your money deserves<br>better tracking.</h2>
+      <p>Join thousands of students and professionals who finally know where their money goes.</p>
+      <a href="login.html" class="btn">Create Free Account →</a>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <p>© 2026 SpendWise | Smart Financial Management</p>
+    <p style="margin-top: 6px;">Email: <a href="mailto:support@spendwise.com">support@spendwise.com</a></p>
+  </footer>
+
+  <script>
+    // Animate dashboard preview counters and bars
+    function animateCount(el, target, prefix, duration) {
+      let start = 0;
+      const step = target / (duration / 16);
+      const timer = setInterval(() => {
+        start = Math.min(start + step, target);
+        el.textContent = prefix + Math.round(start).toLocaleString('en-IN');
+        if (start >= target) clearInterval(timer);
+      }, 16);
+    }
+
+    function initDashboardPreview() {
+      const preview = document.querySelector('.hero-dashboard-preview');
+      if (!preview) return;
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            obs.disconnect();
+            setTimeout(() => {
+              animateCount(document.getElementById('incomeVal'), 15000, '₹', 1400);
+              animateCount(document.getElementById('spentVal'), 8420, '₹', 1600);
+              animateCount(document.getElementById('savedVal'), 6580, '₹', 1800);
+              document.getElementById('spentPct').textContent = '56% of budget';
+              document.getElementById('foodBar').style.width = '80%';
+              document.getElementById('transportBar').style.width = '55%';
+              document.getElementById('entertainBar').style.width = '112%';
+            }, 300);
+          }
+        });
+      }, { threshold: 0.2 });
+      obs.observe(preview);
+    }
+
+    document.addEventListener('DOMContentLoaded', initDashboardPreview);
+
+    // Animate feature/step cards on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card, .mode-card, .step, .reference-card').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(24px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(el);
+    });
+
+    // Animate stat numbers
+    function animateCount(el, target, prefix = '', suffix = '') {
+      let start = 0;
+      const duration = 1800;
+      const step = (timestamp) => {
+        if (!start) start = timestamp;
+        const progress = Math.min((timestamp - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = prefix + Math.floor(eased * target).toLocaleString() + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          statsObserver.unobserve(e.target);
+          const nums = e.target.querySelectorAll('.num');
+          nums.forEach(num => {
+            const text = num.textContent;
+            if (text.includes('K+')) animateCount(num, 10, '', 'K+');
+            else if (text.includes('Cr+')) animateCount(num, 2, '₹', 'Cr+');
+            else if (text.includes('%')) animateCount(num, 98, '', '%');
+            else if (text.includes('★')) animateCount(num, 49, '', '★', 10);
+          });
+        }
+      });
+    }, { threshold: 0.5 });
+
+    const statsBar = document.querySelector('.stats-bar');
+    if (statsBar) statsObserver.observe(statsBar);
+  </script>
+
+</body>
+</html>
